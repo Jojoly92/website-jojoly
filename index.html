@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AutoTX Invoice Selisih Calculator</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, #1c2f55, #081120 45%),
+        radial-gradient(circle at bottom right, #10203d, #081120 35%),
+        #081120;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .card {
+      width: 600px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      padding: 35px;
+      backdrop-filter: blur(18px);
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: #00c3ff;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      top: -120px;
+      right: -80px;
+    }
+
+    .header {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      color: #7fa0c7;
+      font-size: 13px;
+      letter-spacing: 3px;
+      margin-top: 5px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #c9d9ef;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      color: white;
+      font-size: 16px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border: 1px solid #00c3ff;
+      box-shadow: 0 0 15px rgba(0, 195, 255, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg,
+          #00c3ff,
+          #0066ff);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 5px 20px rgba(0, 195, 255, 0.4);
+    }
+
+    .result {
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 22px;
+      padding: 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .row span {
+      color: #91acd0;
+      font-size: 14px;
+    }
+
+    .row strong {
+      color: white;
+      font-size: 16px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right,
+          transparent,
+          rgba(255, 255, 255, 0.15),
+          transparent);
+      margin: 18px 0;
+    }
+
+    .total-box {
+      margin-top: 25px;
+      padding: 22px;
+      border-radius: 18px;
+      background: linear-gradient(135deg,
+          rgba(0, 255, 174, 0.12),
+          rgba(0, 195, 255, 0.10));
+      border: 1px solid rgba(0, 255, 174, 0.2);
+      text-align: center;
+    }
+
+    .total-box p {
+      color: #8fffd0;
+      font-size: 13px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .total-box h2 {
+      color: #00ffae;
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #6d88ad;
+      font-size: 12px;
+    }
+
+    .footer span {
+      color: #00c3ff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <div class="glow"></div>
+
+    <div class="header">
+      <h1>AUTO TX</h1>
+      <p>INVOICE SELISIH FEE</p>
+    </div>
+
+    <div class="input-group">
+      <label>PANEL BO</label>
+      <input type="text" id="bo" placeholder="Masukkan nominal BO">
+    </div>
+
+    <div class="input-group">
+      <label>PANEL AUTOTX</label>
+      <input type="text" id="auto" placeholder="Masukkan nominal AUTO">
+    </div>
+
+    <div class="input-group">
+      <label>TOTAL FEE</label>
+      <input type="text" id="fee" placeholder="Masukkan total fee">
+    </div>
+
+    <button onclick="hitungInvoice()">
+      CONFRIM
+    </button>
+
+    <div class="result">
+
+      <div class="row">
+        <span>PANEL BO CLIENT</span>
+        <strong id="showBo">0</strong>
+      </div>
+
+      <div class="row">
+        <span>PANEL AUTOTX</span>
+        <strong id="showAuto">0</strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <span>SELISIH × 0.25%</span>
+        <strong id="showSelisih">0</strong>
+      </div>
+
+      <div class="row">
+        <span>TOTAL FEE</span>
+        <strong id="showFee">0</strong>
+      </div>
+
+      <div class="total-box">
+
+        <p>TOTAL PAYMENT</p>
+
+        <h2 id="showTotal">
+          0
+        </h2>
+
+      </div>
+
+    </div>
+
+    <div class="footer">
+      Created with 🤍 by <span>JOJOLY</span>
+    </div>
+
+  </div>
+
+  <script>
+    function formatInput(input) {
+      input.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/,/g, '');
+        if (isNaN(value)) return;
+        e.target.value =
+          Number(value).toLocaleString('en-US');
+      });
+    }
+    formatInput(document.getElementById('bo'));
+    formatInput(document.getElementById('auto'));
+    formatInput(document.getElementById('fee'));
+
+    function clean(value) {
+      return Number(
+        value.replace(/,/g, '')
+      );
+    }
+
+    function format(number) {
+      return number.toLocaleString('en-US');
+    }
+
+    function hitungInvoice() {
+      let bo =
+        clean(document.getElementById('bo').value || '0');
+      let autoVal =
+        clean(document.getElementById('auto').value || '0');
+      let fee =
+        clean(document.getElementById('fee').value || '0');
+      let selisih =
+        Math.abs(bo - autoVal);
+      let potongan =
+        Math.round(selisih * 0.0025);
+      let total =
+        fee - potongan;
+      document.getElementById('showBo').innerText =
+        format(bo);
+      document.getElementById('showAuto').innerText =
+        format(autoVal);
+      document.getElementById('showSelisih').innerText =
+        format(selisih) +
+        " × 0.25% = " +
+        format(potongan);
+      document.getElementById('showFee').innerText =
+        format(fee) +
+        " - " +
+        format(potongan);
+      document.getElementById('showTotal').innerText =
+        format(total);
+    }
+  </script>
+
+</body>
+
+</html><!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>AutoTX Invoice Calculator</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background:
+        radial-gradient(circle at top left, #1c2f55, #081120 45%),
+        radial-gradient(circle at bottom right, #10203d, #081120 35%),
+        #081120;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .card {
+      width: 600px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 30px;
+      padding: 35px;
+      backdrop-filter: blur(18px);
+      box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.45);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glow {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background: #00c3ff;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      top: -120px;
+      right: -80px;
+    }
+
+    .header {
+      position: relative;
+      z-index: 2;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      color: #7fa0c7;
+      font-size: 13px;
+      letter-spacing: 3px;
+      margin-top: 5px;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      color: #c9d9ef;
+      font-size: 14px;
+    }
+
+    input {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.06);
+      color: white;
+      font-size: 16px;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    input:focus {
+      border: 1px solid #00c3ff;
+      box-shadow: 0 0 15px rgba(0, 195, 255, 0.3);
+    }
+
+    button {
+      width: 100%;
+      padding: 17px;
+      border: none;
+      border-radius: 16px;
+      background: linear-gradient(135deg,
+          #00c3ff,
+          #0066ff);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow:
+        0 5px 20px rgba(0, 195, 255, 0.4);
+    }
+
+    .result {
+      margin-top: 30px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 22px;
+      padding: 25px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .row span {
+      color: #91acd0;
+      font-size: 14px;
+    }
+
+    .row strong {
+      color: white;
+      font-size: 16px;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right,
+          transparent,
+          rgba(255, 255, 255, 0.15),
+          transparent);
+      margin: 18px 0;
+    }
+
+    .total-box {
+      margin-top: 25px;
+      padding: 22px;
+      border-radius: 18px;
+      background: linear-gradient(135deg,
+          rgba(0, 255, 174, 0.12),
+          rgba(0, 195, 255, 0.10));
+      border: 1px solid rgba(0, 255, 174, 0.2);
+      text-align: center;
+    }
+
+    .total-box p {
+      color: #8fffd0;
+      font-size: 13px;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .total-box h2 {
+      color: #00ffae;
+      font-size: 34px;
+      font-weight: 700;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #6d88ad;
+      font-size: 12px;
+    }
+
+    .footer span {
+      color: #00c3ff;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+  
+    <div class="footer">
+      Created with 🤍 by <span>JOJOLY</span>
+    </div>
+
+  </div>
+
+  <script>
+    function formatInput(input) {
+      input.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/,/g, '');
+        if (isNaN(value)) return;
+        e.target.value =
+          Number(value).toLocaleString('en-US');
+      });
+    }
+    formatInput(document.getElementById('bo'));
+    formatInput(document.getElementById('auto'));
+    formatInput(document.getElementById('fee'));
+
+    function clean(value) {
+      return Number(
+        value.replace(/,/g, '')
+      );
+    }
+
+    function format(number) {
+      return number.toLocaleString('en-US');
+    }
+
+    function hitungInvoice() {
+      let bo =
+        clean(document.getElementById('bo').value || '0');
+      let autoVal =
+        clean(document.getElementById('auto').value || '0');
+      let fee =
+        clean(document.getElementById('fee').value || '0');
+      let selisih =
+        Math.abs(bo - autoVal);
+      let potongan =
+        Math.round(selisih * 0.0025);
+      let total =
+        fee - potongan;
+      document.getElementById('showBo').innerText =
+        format(bo);
+      document.getElementById('showAuto').innerText =
+        format(autoVal);
+      document.getElementById('showSelisih').innerText =
+        format(selisih) +
+        " × 0.25% = " +
+        format(potongan);
+      document.getElementById('showFee').innerText =
+        format(fee) +
+        " - " +
+        format(potongan);
+      document.getElementById('showTotal').innerText =
+        format(total);
+    }
+  </script>
+
+</body>
+
+</html>
